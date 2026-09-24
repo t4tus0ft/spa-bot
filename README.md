@@ -21,6 +21,7 @@ Edita `.env` con tus credenciales (ver [Variables de entorno](#variables-de-ento
 ```bash
 npm start   # producción
 npm run dev # desarrollo con recarga (nodemon)
+npm test    # tests con el runner nativo (node:test)
 ```
 
 La base de datos SQLite se crea y migra automáticamente al arrancar, con un spa por defecto sembrado desde `src/data/catalog.json`.
