@@ -62,50 +62,6 @@ async function handleWhatsApp(req, res) {
   }
 }
 
-async function demoChat(req, res) {
-  try {
-    const { message, sessionId } = req.body;
-    if (!message) {
-      return res.status(400).json({ error: 'message es requerido' });
-    }
-
-    const spa = spaRepository.findFirstActive();
-    if (!spa) {
-      return res.status(404).json({ error: 'No hay spa configurado' });
-    }
-
-    const from = demoConversationKey(req, sessionId);
-    const history = conversationRepository.getHistory(spa.id, from, 6);
-    const result = await openaiService.chat(spa, message, history);
-
-    conversationRepository.addMessage(spa.id, from, 'user', message);
-
-    if (result.schedule) {
-      const outcome = await tryCreateAppointment(spa, from, result.schedule);
-      if (outcome.reply) {
-        result.reply = outcome.reply;
-        result.schedule = null;
-      }
-    }
-
-    conversationRepository.addMessage(spa.id, from, 'assistant', result.reply);
-
-    res.json({ reply: result.reply });
-  } catch (error) {
-    console.error('Error en demo chat:', error.message);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-}
-
-function demoConversationKey(req, sessionId) {
-  const clean = typeof sessionId === 'string' ? sessionId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 32) : '';
-  if (clean) {
-    return `+demo-${clean}`;
-  }
-  const ip = (req.ip || 'anon').replace(/[^a-zA-Z0-9]/g, '');
-  return `+demo-${ip}`;
-}
-
 async function tryCreateAppointment(spa, from, scheduleData) {
   try {
     const serviceId = scheduleData.service_id;
@@ -153,4 +109,4 @@ async function tryCreateAppointment(spa, from, scheduleData) {
   }
 }
 
-module.exports = { handleWhatsApp, demoChat };
+module.exports = { handleWhatsApp };

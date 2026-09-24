@@ -10,7 +10,6 @@ const availabilityController = require('./controllers/availabilityController');
 const chatController = require('./controllers/chatController');
 const adminController = require('./controllers/adminController');
 
-const { rateLimit } = require('./middleware/rateLimit');
 const { verifyWhatsAppWebhook } = require('./middleware/whatsappSignature');
 const { getDatabase, closeDatabase } = require('./config/database');
 const messageRepository = require('./repositories/messageRepository');
@@ -43,11 +42,6 @@ function cleanupConversations() {
 cleanupConversations();
 setInterval(cleanupConversations, 24 * 60 * 60 * 1000).unref();
 
-const demoRateLimit = rateLimit({
-  windowMs: Number(process.env.DEMO_RATE_LIMIT_WINDOW_MS) || 60000,
-  max: Number(process.env.DEMO_RATE_LIMIT_MAX) || 20,
-});
-
 app.get('/health', healthController.health);
 app.get('/webhook-info', healthController.webhookInfo);
 
@@ -56,13 +50,8 @@ app.get('/catalog/:id', catalogController.byId);
 
 app.get('/availability', availabilityController.availability);
 
-app.post('/demo/chat', demoRateLimit, chatController.demoChat);
 app.get('/', (req, res) => {
   res.sendFile('index.html', { root: PUBLIC_DIR });
-});
-
-app.get('/demo', (req, res) => {
-  res.sendFile('demo.html', { root: PUBLIC_DIR });
 });
 
 app.post('/webhook/whatsapp', verifyWhatsAppWebhook, chatController.handleWhatsApp);
