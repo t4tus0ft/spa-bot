@@ -173,6 +173,16 @@
     const inputEl = document.getElementById('input');
     const sendBtn = document.getElementById('sendBtn');
     const typingEl = document.getElementById('typing');
+    const sessionId = getSessionId();
+
+    function getSessionId() {
+      let id = localStorage.getItem('demoSessionId');
+      if (!id) {
+        id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem('demoSessionId', id);
+      }
+      return id;
+    }
 
     inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
 
@@ -200,7 +210,7 @@
         const res = await fetch('/demo/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text }),
+          body: JSON.stringify({ message: text, sessionId }),
         });
         const data = await res.json();
         typingEl.style.display = 'none';

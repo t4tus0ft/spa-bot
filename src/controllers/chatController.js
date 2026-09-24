@@ -39,7 +39,6 @@ async function handleWhatsApp(req, res) {
     const result = await openaiService.chat(spa, text, history);
 
     conversationRepository.addMessage(spa.id, from, 'user', text);
-    conversationRepository.addMessage(spa.id, from, 'assistant', result.reply);
 
     const schedule = result.schedule;
     if (schedule) {
@@ -50,6 +49,7 @@ async function handleWhatsApp(req, res) {
       }
     }
 
+    conversationRepository.addMessage(spa.id, from, 'assistant', result.reply);
     await whatsappService.sendTextMessage(spa, from, result.reply);
 
     res.status(200).send('ok');
@@ -64,18 +64,21 @@ async function handleWhatsApp(req, res) {
 
 async function demoChat(req, res) {
   try {
-    const { message } = req.body;
+    const { message, sessionId } = req.body;
     if (!message) {
       return res.status(400).json({ error: 'message es requerido' });
     }
 
     const spa = spaRepository.findFirstActive();
-    const from = '+demo0000001';
+    if (!spa) {
+      return res.status(404).json({ error: 'No hay spa configurado' });
+    }
+
+    const from = demoConversationKey(req, sessionId);
     const history = conversationRepository.getHistory(spa.id, from, 6);
     const result = await openaiService.chat(spa, message, history);
 
     conversationRepository.addMessage(spa.id, from, 'user', message);
-    conversationRepository.addMessage(spa.id, from, 'assistant', result.reply);
 
     if (result.schedule) {
       const outcome = await tryCreateAppointment(spa, from, result.schedule);
@@ -85,11 +88,22 @@ async function demoChat(req, res) {
       }
     }
 
+    conversationRepository.addMessage(spa.id, from, 'assistant', result.reply);
+
     res.json({ reply: result.reply });
   } catch (error) {
     console.error('Error en demo chat:', error.message);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
+}
+
+function demoConversationKey(req, sessionId) {
+  const clean = typeof sessionId === 'string' ? sessionId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 32) : '';
+  if (clean) {
+    return `+demo-${clean}`;
+  }
+  const ip = (req.ip || 'anon').replace(/[^a-zA-Z0-9]/g, '');
+  return `+demo-${ip}`;
 }
 
 async function tryCreateAppointment(spa, from, scheduleData) {
@@ -105,7 +119,7 @@ async function tryCreateAppointment(spa, from, scheduleData) {
       return { reply: 'Lo siento, esa fecha y hora no están disponibles. ¿Podrías indicarme otra fecha u horario? (por ejemplo, mañana a las 11:00) 🙏' };
     }
 
-    if (!calendarService.isWithinBusinessHours(spa, scheduleData.time)) {
+    if (!calendarService.isWithinBusinessHours(spa, scheduleData.time, service.duration_minutes)) {
       return { reply: `Lo siento, nuestro horario es de ${spa.work_start_hour}:00 a ${spa.work_end_hour}:00. ¿Te conviene otro horario? 🙏` };
     }
 

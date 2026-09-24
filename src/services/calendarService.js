@@ -62,9 +62,10 @@ function isSlotInPast(date, time) {
   return slotDate < now;
 }
 
-function isWithinBusinessHours(spa, time) {
-  const mins = timeToMinutes(time);
-  return mins >= spa.work_start_hour * 60 && mins <= spa.work_end_hour * 60;
+function isWithinBusinessHours(spa, time, durationMinutes = 0) {
+  const start = timeToMinutes(time);
+  const end = start + durationMinutes;
+  return start >= spa.work_start_hour * 60 && end <= spa.work_end_hour * 60;
 }
 
 function normalizeScheduleDate(date, time) {
