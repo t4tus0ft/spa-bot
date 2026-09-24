@@ -20,6 +20,11 @@ function findFirstActive() {
   return db.prepare("SELECT * FROM spas WHERE active = 1 ORDER BY id LIMIT 1").get();
 }
 
+function findByIdOrFirstActive(spaId) {
+  const id = parseInt(spaId, 10);
+  return id ? findById(id) : findFirstActive();
+}
+
 function toCatalog(spa) {
   try {
     const parsed = JSON.parse(spa.catalog_json);
@@ -77,4 +82,4 @@ function update(id, data) {
   return findById(id);
 }
 
-module.exports = { findAll, findById, findByPhoneNumberId, findFirstActive, toCatalog, create, update };
+module.exports = { findAll, findById, findByPhoneNumberId, findFirstActive, findByIdOrFirstActive, toCatalog, create, update };

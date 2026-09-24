@@ -13,7 +13,7 @@ function availability(req, res) {
     return res.status(400).json({ error: 'Formato de fecha inválido. Use YYYY-MM-DD' });
   }
 
-  const spa = resolveSpa(req);
+  const spa = spaRepository.findByIdOrFirstActive(req.query.spa_id);
   if (!spa) {
     return res.status(404).json({ error: 'No hay spa configurado' });
   }
@@ -26,14 +26,6 @@ function availability(req, res) {
     slots,
     count: slots.length,
   });
-}
-
-function resolveSpa(req) {
-  const spaId = parseInt(req.query.spa_id, 10);
-  if (spaId) {
-    return spaRepository.findById(spaId);
-  }
-  return spaRepository.findFirstActive();
 }
 
 module.exports = { availability };

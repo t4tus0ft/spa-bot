@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const healthController = require('./controllers/healthController');
 const catalogController = require('./controllers/catalogController');
@@ -16,6 +17,7 @@ const messageRepository = require('./repositories/messageRepository');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
 app.set('trust proxy', 1);
 app.use(cors());
@@ -41,11 +43,11 @@ app.get('/availability', availabilityController.availability);
 
 app.post('/demo/chat', demoRateLimit, chatController.demoChat);
 app.get('/', (req, res) => {
-  res.sendFile('index.html', { root: 'public' });
+  res.sendFile('index.html', { root: PUBLIC_DIR });
 });
 
 app.get('/demo', (req, res) => {
-  res.sendFile('demo.html', { root: 'public' });
+  res.sendFile('demo.html', { root: PUBLIC_DIR });
 });
 
 app.post('/webhook/whatsapp', verifyWhatsAppWebhook, chatController.handleWhatsApp);
@@ -62,7 +64,7 @@ app.get('/webhook/whatsapp', (req, res) => {
 });
 
 app.get('/admin', (req, res) => {
-  res.sendFile('admin.html', { root: 'public' });
+  res.sendFile('admin.html', { root: PUBLIC_DIR });
 });
 app.get('/api/admin/spas', requireAdmin, adminController.listSpas);
 app.get('/api/admin/spas/:id', requireAdmin, adminController.getSpa);

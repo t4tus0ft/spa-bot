@@ -1,7 +1,7 @@
 const spaRepository = require('../repositories/spaRepository');
 
 function list(req, res) {
-  const spa = resolveSpa(req);
+  const spa = spaRepository.findByIdOrFirstActive(req.query.spa_id);
   if (!spa) {
     return res.status(404).json({ error: 'No hay spa configurado' });
   }
@@ -14,7 +14,7 @@ function list(req, res) {
 }
 
 function byId(req, res) {
-  const spa = resolveSpa(req);
+  const spa = spaRepository.findByIdOrFirstActive(req.query.spa_id);
   if (!spa) {
     return res.status(404).json({ error: 'No hay spa configurado' });
   }
@@ -23,14 +23,6 @@ function byId(req, res) {
     return res.status(404).json({ error: 'Servicio no encontrado' });
   }
   res.json(service);
-}
-
-function resolveSpa(req) {
-  const spaId = parseInt(req.query.spa_id, 10);
-  if (spaId) {
-    return spaRepository.findById(spaId);
-  }
-  return spaRepository.findFirstActive();
 }
 
 module.exports = { list, byId };

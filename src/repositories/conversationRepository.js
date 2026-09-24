@@ -16,10 +16,4 @@ function getHistory(spaId, phone, limit = 10) {
   `).all(spaId, phone, limit).reverse();
 }
 
-function deleteOlderThan(days) {
-  const db = getDatabase();
-  const stmt = db.prepare("DELETE FROM conversations WHERE created_at < datetime('now', '-' || ? || ' days')");
-  return stmt.run(days);
-}
-
-module.exports = { addMessage, getHistory, deleteOlderThan };
+module.exports = { addMessage, getHistory };

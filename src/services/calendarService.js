@@ -7,10 +7,6 @@ function getServiceById(spa, serviceId) {
     || catalog.find(s => normalizeId(s.id) === normalizeId(serviceId));
 }
 
-function isServiceValid(spa, serviceId) {
-  return getServiceById(spa, serviceId) !== undefined;
-}
-
 function normalizeId(id) {
   return String(id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
@@ -102,4 +98,4 @@ function normalizeScheduleDate(date, time) {
   return `${year}-${month}-${day}`;
 }
 
-module.exports = { getServiceById, generateSlots, getAvailableSlots, isSlotInPast, isServiceValid, isWithinBusinessHours, normalizeScheduleDate, normalizeId };
+module.exports = { getServiceById, generateSlots, getAvailableSlots, isSlotInPast, isWithinBusinessHours, normalizeScheduleDate, normalizeId };

@@ -68,10 +68,4 @@ function timeToMinutes(time) {
   return h * 60 + m;
 }
 
-function deleteOlderThan(days) {
-  const db = getDatabase();
-  const stmt = db.prepare("DELETE FROM appointments WHERE created_at < datetime('now', '-' || ? || ' days')");
-  return stmt.run(days);
-}
-
-module.exports = { create, findByPhone, findByDate, findById, updateStatus, findConflictingSlot, deleteOlderThan };
+module.exports = { create, findByPhone, findByDate, findById, updateStatus, findConflictingSlot };
