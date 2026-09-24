@@ -34,6 +34,7 @@ La base de datos SQLite se crea y migra automáticamente al arrancar, con un spa
 | `AI_BASE_URL` | URL base del proveedor (por defecto Groq) |
 | `AI_MODEL` | Modelo a usar |
 | `DATABASE_PATH` | Ruta del archivo SQLite |
+| `CONVERSATION_RETENTION_DAYS` | Días de conversaciones a conservar (0 desactiva la limpieza) |
 | `NODE_ENV` | `development` expone `/webhook-info` |
 | `TIMEZONE` | Zona horaria para la fecha del prompt |
 | `WHATSAPP_VERIFY_TOKEN` | Token de verificación del webhook de Meta |

@@ -14,6 +14,7 @@ const { rateLimit } = require('./middleware/rateLimit');
 const { verifyWhatsAppWebhook } = require('./middleware/whatsappSignature');
 const { getDatabase, closeDatabase } = require('./config/database');
 const messageRepository = require('./repositories/messageRepository');
+const conversationRepository = require('./repositories/conversationRepository');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,20 @@ app.use(express.json({
 
 getDatabase();
 messageRepository.deleteOlderThan(7);
+
+const rawRetention = process.env.CONVERSATION_RETENTION_DAYS;
+const RETENTION_DAYS = rawRetention === undefined ? 90 : Number(rawRetention);
+
+function cleanupConversations() {
+  if (!(RETENTION_DAYS > 0)) return;
+  const result = conversationRepository.deleteOlderThan(RETENTION_DAYS);
+  if (result.changes > 0) {
+    console.log(`Conversaciones eliminadas (>${RETENTION_DAYS} días): ${result.changes}`);
+  }
+}
+
+cleanupConversations();
+setInterval(cleanupConversations, 24 * 60 * 60 * 1000).unref();
 
 const demoRateLimit = rateLimit({
   windowMs: Number(process.env.DEMO_RATE_LIMIT_WINDOW_MS) || 60000,
