@@ -191,7 +191,15 @@
       div.className = 'message ' + role;
       const now = new Date();
       const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-      div.innerHTML = text.replace(/\n/g, '<br>') + '<div class="time">' + time + '</div>';
+
+      const textNode = document.createElement('span');
+      textNode.textContent = text;
+      const timeNode = document.createElement('div');
+      timeNode.className = 'time';
+      timeNode.textContent = time;
+
+      div.appendChild(textNode);
+      div.appendChild(timeNode);
       messagesEl.appendChild(div);
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
