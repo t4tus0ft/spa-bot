@@ -21,7 +21,11 @@ function getSpa(req, res) {
   if (!spa) {
     return res.status(404).json({ error: 'Spa no encontrado' });
   }
-  res.json({
+  res.json(toAdminSpa(spa));
+}
+
+function toAdminSpa(spa) {
+  return {
     id: spa.id,
     name: spa.name,
     work_start_hour: spa.work_start_hour,
@@ -30,7 +34,7 @@ function getSpa(req, res) {
     phone_number_id: spa.phone_number_id || null,
     has_whatsapp_token: !!spa.whatsapp_token,
     catalog: spaRepository.toCatalog(spa),
-  });
+  };
 }
 
 function createSpa(req, res) {
@@ -46,7 +50,7 @@ function createSpa(req, res) {
     phone_number_id: req.body.phone_number_id,
     whatsapp_token: req.body.whatsapp_token,
   });
-  res.status(201).json(spaRepository.findById(id));
+  res.status(201).json(toAdminSpa(spaRepository.findById(id)));
 }
 
 function updateSpa(req, res) {
@@ -54,16 +58,7 @@ function updateSpa(req, res) {
   if (!spa) {
     return res.status(404).json({ error: 'Spa no encontrado' });
   }
-  res.json({
-    id: spa.id,
-    name: spa.name,
-    work_start_hour: spa.work_start_hour,
-    work_end_hour: spa.work_end_hour,
-    active: !!spa.active,
-    phone_number_id: spa.phone_number_id || null,
-    has_whatsapp_token: !!spa.whatsapp_token,
-    catalog: spaRepository.toCatalog(spa),
-  });
+  res.json(toAdminSpa(spa));
 }
 
 function listAppointments(req, res) {

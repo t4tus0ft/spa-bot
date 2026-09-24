@@ -3,9 +3,11 @@ const calendarService = require('../services/calendarService');
 const whatsappService = require('../services/whatsappService');
 const appointmentRepository = require('../repositories/appointmentRepository');
 const conversationRepository = require('../repositories/conversationRepository');
+const messageRepository = require('../repositories/messageRepository');
 const spaRepository = require('../repositories/spaRepository');
 
 async function handleWhatsApp(req, res) {
+  let messageId = null;
   try {
     const value = req.body?.entry?.[0]?.changes?.[0]?.value;
     const msgObj = value?.messages?.[0];
@@ -22,8 +24,14 @@ async function handleWhatsApp(req, res) {
 
     const from = msgObj?.from;
     const text = msgObj?.text?.body;
+    messageId = msgObj?.id;
 
     if (!from || !text) {
+      return res.status(200).send('ok');
+    }
+
+    if (messageId && !messageRepository.markIfNew(messageId)) {
+      console.log(`Webhook WhatsApp duplicado ignorado: ${messageId}`);
       return res.status(200).send('ok');
     }
 
@@ -46,6 +54,9 @@ async function handleWhatsApp(req, res) {
 
     res.status(200).send('ok');
   } catch (error) {
+    if (messageId) {
+      messageRepository.remove(messageId);
+    }
     console.error('Error en chat controller:', error.message);
     res.status(500).json({ error: 'Error interno del servidor' });
   }

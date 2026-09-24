@@ -58,6 +58,11 @@ function runMigrations(db) {
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS processed_messages (
+      message_id TEXT PRIMARY KEY,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
   `);
 
   ensureColumn(db, 'appointments', 'spa_id', 'INTEGER');
@@ -69,6 +74,7 @@ function runMigrations(db) {
     CREATE INDEX IF NOT EXISTS idx_appointments_spa ON appointments(spa_id);
     CREATE INDEX IF NOT EXISTS idx_conversations_phone_created ON conversations(client_phone, created_at);
     CREATE INDEX IF NOT EXISTS idx_conversations_spa_phone ON conversations(spa_id, client_phone);
+    CREATE INDEX IF NOT EXISTS idx_processed_messages_created ON processed_messages(created_at);
   `);
 
   seedDefaultSpa(db);
