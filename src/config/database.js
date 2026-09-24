@@ -6,7 +6,7 @@ let db;
 function getDatabase() {
   if (db) return db;
 
-  const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '..', 'data', 'spa.sqlite');
+  const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '..', '..', 'data', 'spa.sqlite');
   db = new Database(dbPath);
 
   db.pragma('journal_mode = WAL');
@@ -34,7 +34,7 @@ function runMigrations(db) {
 
     CREATE TABLE IF NOT EXISTS appointments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      spa_id INTEGER,
+      spa_id INTEGER REFERENCES spas(id) ON DELETE CASCADE,
       client_name TEXT NOT NULL,
       client_phone TEXT NOT NULL,
       client_email TEXT,
@@ -51,7 +51,7 @@ function runMigrations(db) {
 
     CREATE TABLE IF NOT EXISTS conversations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      spa_id INTEGER,
+      spa_id INTEGER REFERENCES spas(id) ON DELETE CASCADE,
       client_phone TEXT NOT NULL,
       role TEXT NOT NULL CHECK(role IN ('user','assistant')),
       content TEXT NOT NULL,

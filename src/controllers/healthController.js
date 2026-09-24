@@ -10,8 +10,8 @@ function health(req, res) {
     dbOk = false;
   }
 
-  res.json({
-    status: 'ok',
+  res.status(dbOk ? 200 : 503).json({
+    status: dbOk ? 'ok' : 'degraded',
     uptime: Math.floor(process.uptime()),
     database: dbOk ? 'connected' : 'disconnected',
     timestamp: new Date().toISOString(),
