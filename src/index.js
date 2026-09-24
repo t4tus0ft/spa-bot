@@ -28,6 +28,10 @@ app.get('/catalog/:id', catalogController.byId);
 app.get('/availability', availabilityController.availability);
 
 app.post('/demo/chat', chatController.demoChat);
+app.get('/', (req, res) => {
+  res.sendFile('index.html', { root: 'public' });
+});
+
 app.get('/demo', (req, res) => {
   res.sendFile('demo.html', { root: 'public' });
 });
